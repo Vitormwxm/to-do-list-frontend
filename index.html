@@ -1,13 +1,31 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/reset.css">
-    <link rel="stylesheet" href="css/style.css">
-    <title> TodoList</title>
-</head>
-<body>
-    
-</body>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="css/reset.css" />
+        <link rel="stylesheet" href="css/style.css" />
+        <title>TodoList</title>
+    </head>
+    <body>
+        <main id="container">
+            <section class="content">
+                <h1>TodoList</h1>
+                <div class="content_add_task">
+                    <input
+                        type="text"
+                        name="task"
+                        id="add-task"
+                        placeholder="Adicionar tarefa"
+                    />
+                    <button id="add_button">Adicionar</button>
+                </div>
+
+                <div>
+                    <ul id="task-list"></ul>
+                </div>
+            </section>
+        </main>
+        <script src="javascript/script.js"></script>
+    </body>
 </html>
