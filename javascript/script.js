@@ -3,6 +3,10 @@ let inputTask = document.querySelector("#add-task");
 
 buttonAddTask.addEventListener("click", addTask);
 
+window.onload = function () {
+    searchAllTasks();
+};
+
 async function addTask() {
     let taskTitle = inputTask.value;
     if (taskTitle) {
