@@ -1,11 +1,25 @@
 let buttonAddTask = document.querySelector("#add_button");
 let inputTask = document.querySelector("#add-task");
+// let buttonDeleteTask = document.querySelector(".square");
+const listContainer = document.querySelector("#task_list");
 
 buttonAddTask.addEventListener("click", addTask);
+listContainer.addEventListener("click", function (event) {
+    const target = event.target.closest(".square");
+    
+    if (target) {
+        
+        const listItem = target.parentElement;
+        
+        const taskId = listItem.getAttribute("data-task-id");
+       
+        deleteTask(taskId);
+    }
+});
 
 window.onload = function () {
     searchAllTasks();
-};
+}; 
 
 async function addTask() {
     let taskTitle = inputTask.value;
@@ -35,7 +49,7 @@ async function addTask() {
                 const data = await response.json();
                 console.log("Sucesso:", data);
 
-                searchAllTasks(data.title);
+                searchAllTasks();
                 inputTask.value = "";
             }
         } catch (error) {
@@ -52,11 +66,12 @@ async function searchAllTasks() {
 
             const taksData = tasks.content;
 
-            const list = document.querySelector("#task-list");
+            const list = document.querySelector("#task_list");
             list.innerHTML = "";
 
             taksData.forEach((task) => {
-                createTaskView(task.title);
+                console.log(task.id)
+                createTaskView(task.title, task.id);
             });
         }
     } catch (error) {
@@ -64,9 +79,42 @@ async function searchAllTasks() {
     }
 }
 
-function createTaskView(taskTitle) {
-    const list = document.querySelector("#task-list");
+function createTaskView(taskTitle, taskId) {
+    const list = document.querySelector("#task_list");
     const listItem = document.createElement("li");
+
+    listItem.setAttribute("data-task-id", taskId);
     listItem.textContent = taskTitle;
+
+    const deleteButton = document.createElement("span");
+
+    deleteButton.className = "square";
+    deleteButton.innerHTML = '<img src="imgs/icons8-lixeira 1.svg" alt="lixeira" width="30px">';
+    
+    listItem.appendChild(deleteButton);
     list.appendChild(listItem);
+}
+
+async function deleteTask(taskId) {
+    try {
+        const response = await fetch(
+            `http://localhost:8080/todolist/${taskId}`,
+            {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+
+        if (response.ok) {
+            console.log(`Tarefa ${taskId} deletada com sucesso!`);
+            searchAllTasks();
+        } else {
+            console.error("Erro ao deletar a tarefa no servidor.");
+        }
+
+    } catch (error) {
+        console.error("Error deleting task:", error);
+    }
 }
