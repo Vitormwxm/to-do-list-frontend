@@ -1,82 +1,50 @@
-let buttonAddTask = document.querySelector("#add_button");
-let inputTask = document.querySelector("#add-task");
-// let buttonDeleteTask = document.querySelector(".square");
+// --- ELEMENTOS DO DOM ---
+const buttonAddTask = document.querySelector("#add_button");
+const inputTask = document.querySelector("#add-task");
 const listContainer = document.querySelector("#task_list");
 
+// --- EVENTOS ---
+window.onload = searchAllTasks;
 buttonAddTask.addEventListener("click", addTask);
+
 listContainer.addEventListener("click", function (event) {
     const target = event.target.closest(".square");
-  
     if (target) {
-        
         const listItem = target.parentElement;
-        console.log(listItem);
         const taskId = listItem.getAttribute("data-task-id");
-       
         deleteTask(listItem, taskId);
     }
 });
 
-window.onload = function () {
-    searchAllTasks();
-}; 
+// --- INTERFACE (UI) ---
 
-async function addTask() {
-    let taskTitle = inputTask.value;
-    if (taskTitle) {
-        const dateTime = new Date().toISOString();
+function createTaskView(taskTitle, taskId) {
+    const listItem = document.createElement("li");
+    listItem.setAttribute("data-task-id", taskId);
+    listItem.textContent = taskTitle;
+    listItem.classList.add("task-animate"); // Aqui você pode trocar para animateIn se quiser
 
-        const taskPayload = {
-            title: taskTitle,
-            createdAt: dateTime,
-            description: "",
-            status: "PENDING",
-            priority: "1",
-            dueDate: null,
-            updatedAt: dateTime,
-        };
-
-        try {
-            const response = await fetch("http://localhost:8080/todolist", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(taskPayload),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                console.log("Sucesso:", data);
-
-                const newTaskElement = createTaskView(data.title, data.id);
-
-                const taskList = document.querySelector("#task_list");
-                taskList.appendChild(newTaskElement);
-
-                // searchAllTasks();
-                inputTask.value = "";
-            }
-        } catch (error) {
-            console.error("Error adding task:", error);
-        }
-    }
+    const deleteButton = document.createElement("span");
+    deleteButton.className = "square";
+    deleteButton.innerHTML = '<img src="imgs/icons8-lixeira 1.svg" alt="lixeira" width="30px">';
+    
+    listItem.appendChild(deleteButton);
+    return listItem; // Retorna o elemento pronto para ser usado
 }
+
+// --- SERVIÇOS (API) ---
 
 async function searchAllTasks() {
     try {
         const response = await fetch("http://localhost:8080/todolist");
         if (response.ok) {
             const tasks = await response.json();
-
             const taksData = tasks.content;
 
-            const list = document.querySelector("#task_list");
-            list.innerHTML = "";
-
+            listContainer.innerHTML = "";
             taksData.forEach((task) => {
-                console.log(task.id)
-                createTaskView(task.title, task.id);
+                const taskElement = createTaskView(task.title, task.id);
+                listContainer.appendChild(taskElement);
             });
         }
     } catch (error) {
@@ -84,23 +52,40 @@ async function searchAllTasks() {
     }
 }
 
-function createTaskView(taskTitle, taskId) {
-    const list = document.querySelector("#task_list");
-    const listItem = document.createElement("li");
+async function addTask() {
+    let taskTitle = inputTask.value;
+    if (!taskTitle) return;
 
-    listItem.setAttribute("data-task-id", taskId);
-    listItem.textContent = taskTitle;
-    listItem.classList.add("task-animate");
-    const deleteButton = document.createElement("span");
+    const dateTime = new Date().toISOString();
+    const taskPayload = {
+        title: taskTitle,
+        createdAt: dateTime,
+        description: "",
+        status: "PENDING",
+        priority: "1",
+        dueDate: null,
+        updatedAt: dateTime,
+    };
 
-    deleteButton.className = "square";
-    deleteButton.innerHTML = '<img src="imgs/icons8-lixeira 1.svg" alt="lixeira" width="30px">';
-    
-    listItem.appendChild(deleteButton);
-    list.appendChild(listItem);
+    try {
+        const response = await fetch("http://localhost:8080/todolist", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(taskPayload),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const newTaskElement = createTaskView(data.title, data.id);
+            listContainer.appendChild(newTaskElement);
+            inputTask.value = "";
+        }
+    } catch (error) {
+        console.error("Error adding task:", error);
+    }
 }
 
-async function deleteTask(listItem,taskId) {
+async function deleteTask(listItem, taskId) {
     listItem.classList.add("task-animateOut");
     
     const animationEnd = new Promise((resolve) => {
@@ -109,25 +94,19 @@ async function deleteTask(listItem,taskId) {
 
     try {
         await animationEnd;
-
-        const response = await fetch(
-            `http://localhost:8080/todolist/${taskId}`,
-            {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            },
-        );
+        const response = await fetch(`http://localhost:8080/todolist/${taskId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+        });
 
         if (response.ok) {
-            console.log(`Tarefa ${taskId} deletada com sucesso!`);
-            // searchAllTasks();
+            listItem.remove(); // Melhor que searchAllTasks() para manter a animação fluida
+            console.log(`Tarefa ${taskId} deletada.`);
         } else {
-            console.error("Erro ao deletar a tarefa no servidor.");
+            listItem.classList.remove("task-animateOut");
         }
-
     } catch (error) {
         console.error("Error deleting task:", error);
+        listItem.classList.remove("task-animateOut");
     }
 }
