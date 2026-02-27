@@ -85,3 +85,58 @@
     background-color: #F87F7F;
     margin-left: auto;
 }
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.task-animate {
+    animation: fadeInShrink 0.5s ease-out forwards;
+}
+
+.task-animateOut {
+    animation: fadeOutShrink 1.5s forwards;
+}
+
+@keyframes fadeOutShrink {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0;
+    margin-bottom: -50px; /* Ajuda a "fechar" o buraco na lista */
+  }
+}
+
+@keyframes fadeInShrink {
+    0% {
+        opacity: 0;
+        /* Começa um pouco menor (0.8) e deslocado para cima opcionalmente */
+        transform: scale(0.8) translateY(-10px);
+        /* Mantém a altura zerada no início para não pular */
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+        margin-top: 0;
+        margin-bottom: 0;
+    }
+    30% {
+        /* Começa a aparecer e crescer rápido */
+        opacity: 0.5;
+        transform: scale(0.9) translateY(-5px);
+    }
+    100% {
+        opacity: 1;
+        /* Termina no tamanho natural */
+        transform: scale(1) translateY(0);
+        /* Permite que o elemento ocupe sua altura natural */
+        max-height: 200px; /* Um valor alto o suficiente para qualquer tarefa */
+    }
+}

@@ -6,14 +6,14 @@ const listContainer = document.querySelector("#task_list");
 buttonAddTask.addEventListener("click", addTask);
 listContainer.addEventListener("click", function (event) {
     const target = event.target.closest(".square");
-    
+  
     if (target) {
         
         const listItem = target.parentElement;
-        
+        console.log(listItem);
         const taskId = listItem.getAttribute("data-task-id");
        
-        deleteTask(taskId);
+        deleteTask(listItem, taskId);
     }
 });
 
@@ -49,7 +49,12 @@ async function addTask() {
                 const data = await response.json();
                 console.log("Sucesso:", data);
 
-                searchAllTasks();
+                const newTaskElement = createTaskView(data.title, data.id);
+
+                const taskList = document.querySelector("#task_list");
+                taskList.appendChild(newTaskElement);
+
+                // searchAllTasks();
                 inputTask.value = "";
             }
         } catch (error) {
@@ -85,7 +90,7 @@ function createTaskView(taskTitle, taskId) {
 
     listItem.setAttribute("data-task-id", taskId);
     listItem.textContent = taskTitle;
-
+    listItem.classList.add("task-animate");
     const deleteButton = document.createElement("span");
 
     deleteButton.className = "square";
@@ -95,8 +100,16 @@ function createTaskView(taskTitle, taskId) {
     list.appendChild(listItem);
 }
 
-async function deleteTask(taskId) {
+async function deleteTask(listItem,taskId) {
+    listItem.classList.add("task-animateOut");
+    
+    const animationEnd = new Promise((resolve) => {
+        listItem.addEventListener("animationend", resolve, { once: true });
+    });
+
     try {
+        await animationEnd;
+
         const response = await fetch(
             `http://localhost:8080/todolist/${taskId}`,
             {
@@ -109,7 +122,7 @@ async function deleteTask(taskId) {
 
         if (response.ok) {
             console.log(`Tarefa ${taskId} deletada com sucesso!`);
-            searchAllTasks();
+            // searchAllTasks();
         } else {
             console.error("Erro ao deletar a tarefa no servidor.");
         }
