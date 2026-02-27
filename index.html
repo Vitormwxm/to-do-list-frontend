@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="stylesheet" href="css/reset.css" />
         <link rel="stylesheet" href="css/style.css" />
+        <link rel="stylesheet" href="css/modal/modal.css" />
         <title>TodoList</title>
     </head>
     <body>
@@ -28,6 +29,31 @@
                 </div>
             </section>
         </main>
+
+        <div id="modal-container" class="modal-overlay">
+            <div class="modal-content">
+                <header class="modal-header">
+                    <div class="modal-actions">
+                        <h2>Editar tarefa</h2>
+                        <div class="modal-buttons">
+                            <button id="close-modal-cancel">Cancelar</button>
+                            <button id="close-modal-save">Salvar</button>
+                        </div>
+                    </div>
+                </header>
+                <div class="modal-body">
+                    <div>
+                        <h2>Titulo</h2>
+                        <p id="modal-title">Detalhes da Tarefa</p>
+                    </div>
+                    <p><strong>Status:</strong> <span id="modal-status"></span></p>
+                    <p><strong>Criada em:</strong> <span id="modal-date"></span></p>
+                    <p><strong>Descrição:</strong></p>
+                    <textarea id="modal-description" ></textarea>
+                </div>
+            </div>
+        </div>
+
         <script src="javascript/script.js"></script>
     </body>
 </html>
